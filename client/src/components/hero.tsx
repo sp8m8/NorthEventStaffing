@@ -20,7 +20,7 @@ export default function Hero() {
                 </Button>
               </Link>
               <Link href="/services">
-                <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-primary w-full sm:w-auto">
+                <Button size="lg" variant="outline" className="border-2 border-primary bg-white text-primary hover:bg-primary hover:text-white w-full sm:w-auto">
                   View Services
                 </Button>
               </Link>

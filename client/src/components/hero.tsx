@@ -14,14 +14,14 @@ export default function Hero() {
               Comprehensive music event staffing from bar staff and sound technicians to riggers, security, and production managers. Fair rates, fast response, fully licensed professionals across the North of England.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/contact">
+              <Link href="/packages">
                 <Button size="lg" className="bg-white text-primary hover:bg-gray-100 w-full sm:w-auto">
-                  Book Staff Now
+                  View Packages
                 </Button>
               </Link>
-              <Link href="/services">
-                <Button size="lg" variant="outline" className="border-2 border-primary bg-white text-primary hover:bg-primary hover:text-white w-full sm:w-auto">
-                  View Services
+              <Link href="/contact">
+                <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-primary w-full sm:w-auto">
+                  Get Quote
                 </Button>
               </Link>
             </div>

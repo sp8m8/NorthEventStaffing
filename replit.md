@@ -2,7 +2,7 @@
 
 ## Overview
 
-Yorkshire Events Staffing is a full-stack web application built for professional event staffing solutions across West Yorkshire and North England. The platform connects event organizers with skilled staff including bar staff, sound technicians, and brand ambassadors. The application features a modern React frontend with a Node.js/Express backend, utilizing PostgreSQL for data persistence.
+NORTH STAFF is a comprehensive full-stack web application providing music event staffing solutions across West Yorkshire and North England. Founded in 2025, the platform serves as a "fair to staff and affordable one-stop shop for music event staffing up north" covering all essential roles for music-based events. The application features 10 comprehensive staff categories, competitive package deals, staff portal functionality, and full UK regulation compliance. Built with a modern React frontend and Node.js/Express backend, utilizing PostgreSQL for data persistence.
 
 ## System Architecture
 
@@ -99,6 +99,8 @@ The application follows a monorepo structure with clear separation between clien
 ```
 Changelog:
 - July 06, 2025. Initial setup
+- July 06, 2025. Added comprehensive packages page with 3-tier pricing structure (Starter £180, Professional £420, Premium £850) including customizable add-ons and competitive deals for events of varying scales
+- July 06, 2025. Updated navigation to include packages page, updated hero CTA buttons to prioritize packages
 ```
 
 ## User Preferences

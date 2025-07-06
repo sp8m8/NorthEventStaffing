@@ -39,11 +39,11 @@ export default function Footer() {
           <div>
             <h3 className="text-lg font-semibold mb-6">Services</h3>
             <ul className="space-y-3">
-              <li><Link href="/services"><span className="text-gray-300 hover:text-primary transition-colors cursor-pointer">Bar Staff</span></Link></li>
-              <li><Link href="/services"><span className="text-gray-300 hover:text-primary transition-colors cursor-pointer">Sound Technicians</span></Link></li>
-              <li><Link href="/services"><span className="text-gray-300 hover:text-primary transition-colors cursor-pointer">Brand Ambassadors</span></Link></li>
-              <li><Link href="/services"><span className="text-gray-300 hover:text-primary transition-colors cursor-pointer">Stewards</span></Link></li>
-              <li><Link href="/services"><span className="text-gray-300 hover:text-primary transition-colors cursor-pointer">Security</span></Link></li>
+              <li><Link href="/services"><span className="text-gray-300 hover:text-primary transition-colors cursor-pointer">All Services</span></Link></li>
+              <li><Link href="/packages"><span className="text-gray-300 hover:text-primary transition-colors cursor-pointer">Event Packages</span></Link></li>
+              <li><Link href="/staff-portal"><span className="text-gray-300 hover:text-primary transition-colors cursor-pointer">Staff Portal</span></Link></li>
+              <li><Link href="/join-us"><span className="text-gray-300 hover:text-primary transition-colors cursor-pointer">Join Our Team</span></Link></li>
+              <li><Link href="/contact"><span className="text-gray-300 hover:text-primary transition-colors cursor-pointer">Get Quote</span></Link></li>
             </ul>
           </div>
 

@@ -38,6 +38,13 @@ const staffTypeOptions = [
   { id: "bar-staff", label: "Bar Staff" },
   { id: "sound-technician", label: "Sound Technicians" },
   { id: "brand-ambassador", label: "Brand Ambassadors" },
+  { id: "steward", label: "Stewards" },
+  { id: "security", label: "Security" },
+  { id: "rigger", label: "Riggers / Stage Setup" },
+  { id: "lighting-technician", label: "Lighting Technicians" },
+  { id: "production-manager", label: "Production Managers" },
+  { id: "backstage-crew", label: "Backstage Crew" },
+  { id: "merchandise", label: "Merchandise Staff" },
 ];
 
 export default function Contact() {
@@ -87,8 +94,8 @@ export default function Contact() {
 
   return (
     <div className="min-h-screen">
-      <title>Contact Us - Yorkshire Events Staffing</title>
-      <meta name="description" content="Get a quote for professional event staff in West Yorkshire. Bar staff, sound technicians, and brand ambassadors available. Fast response guaranteed." />
+      <title>Contact Us - NORTH STAFF</title>
+      <meta name="description" content="Get a quote for professional event staff across the North of England. Bar staff, sound technicians, brand ambassadors, stewards, and security available. Fast response guaranteed." />
       
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-primary to-secondary text-white py-20">
@@ -352,7 +359,7 @@ export default function Contact() {
                       <Mail className="w-5 h-5 text-primary mr-3" />
                       <div>
                         <p className="font-semibold text-dark">Email</p>
-                        <p className="text-medium">hello@yorkshirestaffing.co.uk</p>
+                        <p className="text-medium">hello@northstaff.co.uk</p>
                       </div>
                     </div>
                     <div className="flex items-start">

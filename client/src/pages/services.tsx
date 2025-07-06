@@ -60,8 +60,8 @@ const services = [
 export default function Services() {
   return (
     <div className="min-h-screen">
-      <title>Our Services - Yorkshire Events Staffing</title>
-      <meta name="description" content="Professional bar staff, sound technicians, and brand ambassadors across West Yorkshire. Licensed, experienced event professionals." />
+      <title>Our Services - NORTH STAFF</title>
+      <meta name="description" content="Professional bar staff, sound technicians, brand ambassadors, stewards, and security personnel across the North of England. Licensed, experienced event professionals." />
       
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-primary to-secondary text-white py-20">

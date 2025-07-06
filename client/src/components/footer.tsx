@@ -10,11 +10,11 @@ export default function Footer() {
           <div className="md:col-span-2">
             <div className="flex items-center mb-6">
               <Users className="text-primary text-2xl mr-3" />
-              <span className="text-xl font-bold">Yorkshire Events Staffing</span>
+              <span className="text-xl font-bold">NORTH STAFF</span>
             </div>
             <p className="text-gray-300 mb-6 max-w-md">
-              Professional event staffing solutions across West Yorkshire and the North of England. 
-              Trusted by event organizers for reliable, skilled staff.
+              Your one stop shop for event staffing up north. Professional bar staff, sound technicians, 
+              brand ambassadors, stewards, and security personnel across the North of England.
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-300 hover:text-primary transition-colors">
@@ -42,7 +42,8 @@ export default function Footer() {
               <li><Link href="/services"><span className="text-gray-300 hover:text-primary transition-colors cursor-pointer">Bar Staff</span></Link></li>
               <li><Link href="/services"><span className="text-gray-300 hover:text-primary transition-colors cursor-pointer">Sound Technicians</span></Link></li>
               <li><Link href="/services"><span className="text-gray-300 hover:text-primary transition-colors cursor-pointer">Brand Ambassadors</span></Link></li>
-              <li><Link href="/services"><span className="text-gray-300 hover:text-primary transition-colors cursor-pointer">Event Security</span></Link></li>
+              <li><Link href="/services"><span className="text-gray-300 hover:text-primary transition-colors cursor-pointer">Stewards</span></Link></li>
+              <li><Link href="/services"><span className="text-gray-300 hover:text-primary transition-colors cursor-pointer">Security</span></Link></li>
             </ul>
           </div>
 
@@ -56,7 +57,7 @@ export default function Footer() {
               </div>
               <div className="flex items-center text-gray-300">
                 <Mail className="mr-3 text-primary h-4 w-4" />
-                <span>hello@yorkshirestaffing.co.uk</span>
+                <span>hello@northstaff.co.uk</span>
               </div>
               <div className="flex items-start text-gray-300">
                 <MapPin className="mr-3 text-primary h-4 w-4 mt-1" />
@@ -68,7 +69,7 @@ export default function Footer() {
 
         <div className="border-t border-gray-700 mt-12 pt-8 text-center">
           <p className="text-gray-300">
-            © 2024 Yorkshire Events Staffing. All rights reserved. | 
+            © 2024 NORTH STAFF. All rights reserved. | 
             <Link href="/privacy"><span className="hover:text-primary transition-colors cursor-pointer"> Privacy Policy</span></Link> | 
             <Link href="/terms"><span className="hover:text-primary transition-colors cursor-pointer"> Terms of Service</span></Link>
           </p>

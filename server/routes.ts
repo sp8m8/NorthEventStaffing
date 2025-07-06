@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertServiceRequestSchema } from "@shared/schema";
+import { insertServiceRequestSchema, insertStaffApplicationSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -74,6 +74,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(requests);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch service requests" });
+    }
+  });
+
+  // Staff application routes
+  app.post("/api/staff-applications", async (req, res) => {
+    try {
+      const validatedData = insertStaffApplicationSchema.parse(req.body);
+      const application = await storage.createStaffApplication(validatedData);
+      res.status(201).json(application);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          message: "Invalid application data", 
+          errors: error.errors 
+        });
+      }
+      res.status(500).json({ message: "Failed to create staff application" });
+    }
+  });
+
+  app.get("/api/staff-applications", async (_req, res) => {
+    try {
+      const applications = await storage.getAllStaffApplications();
+      res.json(applications);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch staff applications" });
+    }
+  });
+
+  app.patch("/api/staff-applications/:id/status", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { status, reviewedBy, notes } = req.body;
+      const application = await storage.updateStaffApplicationStatus(id, status, reviewedBy, notes);
+      if (!application) {
+        return res.status(404).json({ message: "Application not found" });
+      }
+      res.json(application);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update application status" });
     }
   });
 

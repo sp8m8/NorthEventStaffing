@@ -10,6 +10,7 @@ import Services from "@/pages/services";
 import Staff from "@/pages/staff";
 import About from "@/pages/about";
 import Contact from "@/pages/contact";
+import JoinUs from "@/pages/join-us";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -20,6 +21,7 @@ function Router() {
       <Route path="/staff" component={Staff} />
       <Route path="/about" component={About} />
       <Route path="/contact" component={Contact} />
+      <Route path="/join-us" component={JoinUs} />
       <Route component={NotFound} />
     </Switch>
   );

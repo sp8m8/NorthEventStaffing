@@ -8,10 +8,10 @@ export default function Hero() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
             <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-6">
-              Professional Event Staffing Solutions in West Yorkshire
+              Your One Stop Shop for Event Staffing Up North
             </h1>
             <p className="text-xl mb-8 text-blue-100">
-              Connecting exceptional talent with outstanding events across the North of England. Bar staff, sound technicians, and brand ambassadors ready for your next event.
+              Comprehensive music event staffing from bar staff and sound technicians to riggers, security, and production managers. Fair rates, fast response, fully licensed professionals across the North of England.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link href="/contact">

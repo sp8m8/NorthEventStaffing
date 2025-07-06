@@ -13,6 +13,7 @@ const navigation = [
   { name: "Services", href: "/services" },
   { name: "Our Staff", href: "/staff" },
   { name: "About", href: "/about" },
+  { name: "Join Us", href: "/join-us" },
 ];
 
 export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {

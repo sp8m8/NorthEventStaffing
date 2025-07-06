@@ -13,6 +13,7 @@ export default function Header() {
     { name: "Services", href: "/services" },
     { name: "Our Staff", href: "/staff" },
     { name: "About", href: "/about" },
+    { name: "Join Us", href: "/join-us" },
   ];
 
   return (
@@ -22,7 +23,7 @@ export default function Header() {
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
               <Users className="text-primary text-2xl mr-3" />
-              <span className="text-xl font-bold text-dark">Yorkshire Events Staffing</span>
+              <span className="text-xl font-bold text-dark">NORTH STAFF</span>
             </Link>
           </div>
           

@@ -4,6 +4,15 @@ import {
   testimonials,
   staffApplications,
   staffSchedule,
+  users,
+  clients,
+  events,
+  shifts,
+  shiftAssignments,
+  notifications,
+  staffProfiles,
+  staffAvailability,
+  staffDocuments,
   type Staff, 
   type InsertStaff,
   type ServiceRequest,
@@ -13,10 +22,32 @@ import {
   type StaffApplication,
   type InsertStaffApplication,
   type StaffSchedule,
-  type InsertStaffSchedule
+  type InsertStaffSchedule,
+  type User,
+  type UpsertUser,
+  type Client,
+  type InsertClient,
+  type Event,
+  type InsertEvent,
+  type Shift,
+  type InsertShift,
+  type ShiftAssignment,
+  type InsertShiftAssignment,
+  type Notification,
+  type InsertNotification,
+  type StaffProfile,
+  type InsertStaffProfile,
+  type StaffAvailability,
+  type InsertStaffAvailability,
+  type StaffDocument,
+  type InsertStaffDocument
 } from "@shared/schema";
 
 export interface IStorage {
+  // User management (required for Replit Auth)
+  getUser(id: string): Promise<User | undefined>;
+  upsertUser(user: UpsertUser): Promise<User>;
+
   // Staff methods
   getAllStaff(): Promise<Staff[]>;
   getStaffByCategory(category: string): Promise<Staff[]>;
@@ -38,10 +69,63 @@ export interface IStorage {
   getStaffApplicationById(id: number): Promise<StaffApplication | undefined>;
   updateStaffApplicationStatus(id: number, status: string, reviewedBy?: string, notes?: string): Promise<StaffApplication | undefined>;
 
-  // Staff schedule methods
+  // Legacy staff schedule methods
   createStaffSchedule(schedule: InsertStaffSchedule): Promise<StaffSchedule>;
   getStaffScheduleByStaffId(staffId: number): Promise<StaffSchedule[]>;
   getAllStaffSchedule(): Promise<StaffSchedule[]>;
+
+  // Client management
+  getAllClients(): Promise<Client[]>;
+  getClientById(id: number): Promise<Client | undefined>;
+  createClient(client: InsertClient): Promise<Client>;
+  updateClient(id: number, client: Partial<InsertClient>): Promise<Client | undefined>;
+
+  // Event management
+  getAllEvents(): Promise<Event[]>;
+  getEventById(id: number): Promise<Event | undefined>;
+  getEventsByDateRange(startDate: string, endDate: string): Promise<Event[]>;
+  createEvent(event: InsertEvent): Promise<Event>;
+  updateEvent(id: number, event: Partial<InsertEvent>): Promise<Event | undefined>;
+  deleteEvent(id: number): Promise<boolean>;
+
+  // Shift management
+  getAllShifts(): Promise<Shift[]>;
+  getShiftById(id: number): Promise<Shift | undefined>;
+  getShiftsByEventId(eventId: number): Promise<Shift[]>;
+  getShiftsByDateRange(startDate: string, endDate: string): Promise<Shift[]>;
+  getAvailableShifts(): Promise<Shift[]>;
+  createShift(shift: InsertShift): Promise<Shift>;
+  updateShift(id: number, shift: Partial<InsertShift>): Promise<Shift | undefined>;
+  deleteShift(id: number): Promise<boolean>;
+
+  // Shift assignment management
+  getAllShiftAssignments(): Promise<ShiftAssignment[]>;
+  getShiftAssignmentById(id: number): Promise<ShiftAssignment | undefined>;
+  getShiftAssignmentsByShiftId(shiftId: number): Promise<ShiftAssignment[]>;
+  getShiftAssignmentsByStaffId(staffId: number): Promise<ShiftAssignment[]>;
+  createShiftAssignment(assignment: InsertShiftAssignment): Promise<ShiftAssignment>;
+  updateShiftAssignment(id: number, assignment: Partial<InsertShiftAssignment>): Promise<ShiftAssignment | undefined>;
+  deleteShiftAssignment(id: number): Promise<boolean>;
+
+  // Notification management
+  getNotificationsByUserId(userId: string): Promise<Notification[]>;
+  createNotification(notification: InsertNotification): Promise<Notification>;
+  markNotificationAsRead(id: number): Promise<boolean>;
+
+  // Staff profile management
+  getStaffProfileByUserId(userId: string): Promise<StaffProfile | undefined>;
+  createStaffProfile(profile: InsertStaffProfile): Promise<StaffProfile>;
+  updateStaffProfile(userId: string, profile: Partial<InsertStaffProfile>): Promise<StaffProfile | undefined>;
+
+  // Staff availability
+  getStaffAvailabilityByStaffId(staffId: number): Promise<StaffAvailability[]>;
+  createStaffAvailability(availability: InsertStaffAvailability): Promise<StaffAvailability>;
+  updateStaffAvailability(id: number, availability: Partial<InsertStaffAvailability>): Promise<StaffAvailability | undefined>;
+
+  // Staff documents
+  getStaffDocumentsByStaffId(staffId: number): Promise<StaffDocument[]>;
+  createStaffDocument(document: InsertStaffDocument): Promise<StaffDocument>;
+  updateStaffDocument(id: number, document: Partial<InsertStaffDocument>): Promise<StaffDocument | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -50,11 +134,31 @@ export class MemStorage implements IStorage {
   private testimonials: Map<number, Testimonial>;
   private staffApplications: Map<number, StaffApplication>;
   private staffSchedule: Map<number, StaffSchedule>;
+  
+  // New storage maps
+  private users: Map<string, User>;
+  private clients: Map<number, Client>;
+  private events: Map<number, Event>;
+  private shifts: Map<number, Shift>;
+  private shiftAssignments: Map<number, ShiftAssignment>;
+  private notifications: Map<number, Notification>;
+  private staffProfiles: Map<string, StaffProfile>;
+  private staffAvailability: Map<number, StaffAvailability>;
+  private staffDocuments: Map<number, StaffDocument>;
+  
+  // Counters
   private currentStaffId: number;
   private currentRequestId: number;
   private currentTestimonialId: number;
   private currentApplicationId: number;
   private currentScheduleId: number;
+  private currentClientId: number;
+  private currentEventId: number;
+  private currentShiftId: number;
+  private currentAssignmentId: number;
+  private currentNotificationId: number;
+  private currentAvailabilityId: number;
+  private currentDocumentId: number;
 
   constructor() {
     this.staff = new Map();
@@ -62,11 +166,31 @@ export class MemStorage implements IStorage {
     this.testimonials = new Map();
     this.staffApplications = new Map();
     this.staffSchedule = new Map();
+    
+    // Initialize new maps
+    this.users = new Map();
+    this.clients = new Map();
+    this.events = new Map();
+    this.shifts = new Map();
+    this.shiftAssignments = new Map();
+    this.notifications = new Map();
+    this.staffProfiles = new Map();
+    this.staffAvailability = new Map();
+    this.staffDocuments = new Map();
+    
+    // Initialize counters
     this.currentStaffId = 1;
     this.currentRequestId = 1;
     this.currentTestimonialId = 1;
     this.currentApplicationId = 1;
     this.currentScheduleId = 1;
+    this.currentClientId = 1;
+    this.currentEventId = 1;
+    this.currentShiftId = 1;
+    this.currentAssignmentId = 1;
+    this.currentNotificationId = 1;
+    this.currentAvailabilityId = 1;
+    this.currentDocumentId = 1;
 
     // Initialize with sample data
     this.initializeData();
@@ -401,6 +525,318 @@ export class MemStorage implements IStorage {
 
   async getAllStaffSchedule(): Promise<StaffSchedule[]> {
     return Array.from(this.staffSchedule.values());
+  }
+
+  // User management methods (required for Replit Auth)
+  async getUser(id: string): Promise<User | undefined> {
+    return this.users.get(id);
+  }
+
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const existingUser = this.users.get(userData.id);
+    const user: User = {
+      ...userData,
+      createdAt: existingUser?.createdAt || new Date(),
+      updatedAt: new Date(),
+      role: userData.role || "staff",
+      staffId: userData.staffId || null,
+      email: userData.email || null,
+      firstName: userData.firstName || null,
+      lastName: userData.lastName || null,
+      profileImageUrl: userData.profileImageUrl || null,
+    };
+    this.users.set(userData.id, user);
+    return user;
+  }
+
+  // Client management methods
+  async getAllClients(): Promise<Client[]> {
+    return Array.from(this.clients.values());
+  }
+
+  async getClientById(id: number): Promise<Client | undefined> {
+    return this.clients.get(id);
+  }
+
+  async createClient(client: InsertClient): Promise<Client> {
+    const id = this.currentClientId++;
+    const newClient: Client = { 
+      ...client, 
+      id, 
+      createdAt: new Date(),
+      company: client.company || null,
+      phone: client.phone || null,
+      address: client.address || null,
+      contactPerson: client.contactPerson || null,
+      notes: client.notes || null
+    };
+    this.clients.set(id, newClient);
+    return newClient;
+  }
+
+  async updateClient(id: number, client: Partial<InsertClient>): Promise<Client | undefined> {
+    const existing = this.clients.get(id);
+    if (!existing) return undefined;
+    const updated = { ...existing, ...client };
+    this.clients.set(id, updated);
+    return updated;
+  }
+
+  // Event management methods
+  async getAllEvents(): Promise<Event[]> {
+    return Array.from(this.events.values());
+  }
+
+  async getEventById(id: number): Promise<Event | undefined> {
+    return this.events.get(id);
+  }
+
+  async getEventsByDateRange(startDate: string, endDate: string): Promise<Event[]> {
+    return Array.from(this.events.values()).filter(e => 
+      e.eventDate >= startDate && e.eventDate <= endDate
+    );
+  }
+
+  async createEvent(event: InsertEvent): Promise<Event> {
+    const id = this.currentEventId++;
+    const newEvent: Event = { 
+      ...event, 
+      id, 
+      status: event.status || "planned",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      description: event.description || null,
+      expectedAttendees: event.expectedAttendees || null,
+      budget: event.budget || null,
+      specialRequirements: event.specialRequirements || null
+    };
+    this.events.set(id, newEvent);
+    return newEvent;
+  }
+
+  async updateEvent(id: number, event: Partial<InsertEvent>): Promise<Event | undefined> {
+    const existing = this.events.get(id);
+    if (!existing) return undefined;
+    const updated = { ...existing, ...event, updatedAt: new Date() };
+    this.events.set(id, updated);
+    return updated;
+  }
+
+  async deleteEvent(id: number): Promise<boolean> {
+    return this.events.delete(id);
+  }
+
+  // Shift management methods
+  async getAllShifts(): Promise<Shift[]> {
+    return Array.from(this.shifts.values());
+  }
+
+  async getShiftById(id: number): Promise<Shift | undefined> {
+    return this.shifts.get(id);
+  }
+
+  async getShiftsByEventId(eventId: number): Promise<Shift[]> {
+    return Array.from(this.shifts.values()).filter(s => s.eventId === eventId);
+  }
+
+  async getShiftsByDateRange(startDate: string, endDate: string): Promise<Shift[]> {
+    return Array.from(this.shifts.values()).filter(s => 
+      s.shiftDate >= startDate && s.shiftDate <= endDate
+    );
+  }
+
+  async getAvailableShifts(): Promise<Shift[]> {
+    return Array.from(this.shifts.values()).filter(s => s.status === "open");
+  }
+
+  async createShift(shift: InsertShift): Promise<Shift> {
+    const id = this.currentShiftId++;
+    const newShift: Shift = { 
+      ...shift, 
+      id, 
+      status: shift.status || "open",
+      requiredCount: shift.requiredCount || 1,
+      filledCount: 0,
+      createdAt: new Date(),
+      position: shift.position || null,
+      description: shift.description || null,
+      requirements: shift.requirements || null,
+      supervisorId: shift.supervisorId || null
+    };
+    this.shifts.set(id, newShift);
+    return newShift;
+  }
+
+  async updateShift(id: number, shift: Partial<InsertShift>): Promise<Shift | undefined> {
+    const existing = this.shifts.get(id);
+    if (!existing) return undefined;
+    const updated = { ...existing, ...shift };
+    this.shifts.set(id, updated);
+    return updated;
+  }
+
+  async deleteShift(id: number): Promise<boolean> {
+    return this.shifts.delete(id);
+  }
+
+  // Basic implementations for other required methods
+  async getAllShiftAssignments(): Promise<ShiftAssignment[]> {
+    return Array.from(this.shiftAssignments.values());
+  }
+
+  async getShiftAssignmentById(id: number): Promise<ShiftAssignment | undefined> {
+    return this.shiftAssignments.get(id);
+  }
+
+  async getShiftAssignmentsByShiftId(shiftId: number): Promise<ShiftAssignment[]> {
+    return Array.from(this.shiftAssignments.values()).filter(a => a.shiftId === shiftId);
+  }
+
+  async getShiftAssignmentsByStaffId(staffId: number): Promise<ShiftAssignment[]> {
+    return Array.from(this.shiftAssignments.values()).filter(a => a.staffId === staffId);
+  }
+
+  async createShiftAssignment(assignment: InsertShiftAssignment): Promise<ShiftAssignment> {
+    const id = this.currentAssignmentId++;
+    const newAssignment: ShiftAssignment = { 
+      ...assignment, 
+      id, 
+      status: assignment.status || "confirmed",
+      assignedAt: new Date(),
+      checkInTime: assignment.checkInTime || null,
+      checkOutTime: assignment.checkOutTime || null,
+      actualHours: assignment.actualHours || null,
+      notes: assignment.notes || null,
+      rating: assignment.rating || null,
+      feedback: assignment.feedback || null
+    };
+    this.shiftAssignments.set(id, newAssignment);
+    return newAssignment;
+  }
+
+  async updateShiftAssignment(id: number, assignment: Partial<InsertShiftAssignment>): Promise<ShiftAssignment | undefined> {
+    const existing = this.shiftAssignments.get(id);
+    if (!existing) return undefined;
+    const updated = { ...existing, ...assignment };
+    this.shiftAssignments.set(id, updated);
+    return updated;
+  }
+
+  async deleteShiftAssignment(id: number): Promise<boolean> {
+    return this.shiftAssignments.delete(id);
+  }
+
+  // Notification methods
+  async getNotificationsByUserId(userId: string): Promise<Notification[]> {
+    return Array.from(this.notifications.values()).filter(n => n.userId === userId);
+  }
+
+  async createNotification(notification: InsertNotification): Promise<Notification> {
+    const id = this.currentNotificationId++;
+    const newNotification: Notification = { 
+      ...notification, 
+      id, 
+      read: false,
+      createdAt: new Date(),
+      relatedShiftId: notification.relatedShiftId || null,
+      relatedEventId: notification.relatedEventId || null
+    };
+    this.notifications.set(id, newNotification);
+    return newNotification;
+  }
+
+  async markNotificationAsRead(id: number): Promise<boolean> {
+    const notification = this.notifications.get(id);
+    if (!notification) return false;
+    notification.read = true;
+    return true;
+  }
+
+  // Staff profile methods
+  async getStaffProfileByUserId(userId: string): Promise<StaffProfile | undefined> {
+    return this.staffProfiles.get(userId);
+  }
+
+  async createStaffProfile(profile: InsertStaffProfile): Promise<StaffProfile> {
+    const newProfile: StaffProfile = { 
+      ...profile, 
+      id: this.currentStaffId++,
+      profileComplete: false,
+      documentsUploaded: false,
+      updatedAt: new Date(),
+      emergencyContactName: profile.emergencyContactName || null,
+      emergencyContactPhone: profile.emergencyContactPhone || null,
+      bankAccountName: profile.bankAccountName || null,
+      bankAccountNumber: profile.bankAccountNumber || null,
+      bankSortCode: profile.bankSortCode || null,
+      nationalInsuranceNumber: profile.nationalInsuranceNumber || null,
+      backgroundCheckStatus: profile.backgroundCheckStatus || "pending",
+      availabilityNotes: profile.availabilityNotes || null,
+      preferredRoles: profile.preferredRoles || null
+    };
+    this.staffProfiles.set(profile.userId, newProfile);
+    return newProfile;
+  }
+
+  async updateStaffProfile(userId: string, profile: Partial<InsertStaffProfile>): Promise<StaffProfile | undefined> {
+    const existing = this.staffProfiles.get(userId);
+    if (!existing) return undefined;
+    const updated = { ...existing, ...profile, updatedAt: new Date() };
+    this.staffProfiles.set(userId, updated);
+    return updated;
+  }
+
+  // Staff availability methods
+  async getStaffAvailabilityByStaffId(staffId: number): Promise<StaffAvailability[]> {
+    return Array.from(this.staffAvailability.values()).filter(a => a.staffId === staffId);
+  }
+
+  async createStaffAvailability(availability: InsertStaffAvailability): Promise<StaffAvailability> {
+    const id = this.currentAvailabilityId++;
+    const newAvailability: StaffAvailability = { 
+      ...availability, 
+      id,
+      available: availability.available !== undefined ? availability.available : true,
+      notes: availability.notes || null
+    };
+    this.staffAvailability.set(id, newAvailability);
+    return newAvailability;
+  }
+
+  async updateStaffAvailability(id: number, availability: Partial<InsertStaffAvailability>): Promise<StaffAvailability | undefined> {
+    const existing = this.staffAvailability.get(id);
+    if (!existing) return undefined;
+    const updated = { ...existing, ...availability };
+    this.staffAvailability.set(id, updated);
+    return updated;
+  }
+
+  // Staff documents methods
+  async getStaffDocumentsByStaffId(staffId: number): Promise<StaffDocument[]> {
+    return Array.from(this.staffDocuments.values()).filter(d => d.staffId === staffId);
+  }
+
+  async createStaffDocument(document: InsertStaffDocument): Promise<StaffDocument> {
+    const id = this.currentDocumentId++;
+    const newDocument: StaffDocument = { 
+      ...document, 
+      id,
+      verified: false,
+      uploadedAt: new Date(),
+      expiryDate: document.expiryDate || null,
+      verifiedBy: null,
+      verifiedAt: null
+    };
+    this.staffDocuments.set(id, newDocument);
+    return newDocument;
+  }
+
+  async updateStaffDocument(id: number, document: Partial<InsertStaffDocument>): Promise<StaffDocument | undefined> {
+    const existing = this.staffDocuments.get(id);
+    if (!existing) return undefined;
+    const updated = { ...existing, ...document };
+    this.staffDocuments.set(id, updated);
+    return updated;
   }
 }
 

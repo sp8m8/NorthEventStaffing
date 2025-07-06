@@ -19,7 +19,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Calendar, Clock, MapPin, Users, Upload, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, Upload, CheckCircle, XCircle, AlertCircle, Bell, Star, Award } from "lucide-react";
 
 // Mock data for demonstration - in real app this would come from the database
 const mockShifts = [

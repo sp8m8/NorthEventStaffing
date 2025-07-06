@@ -12,6 +12,7 @@ import About from "@/pages/about";
 import Contact from "@/pages/contact";
 import JoinUs from "@/pages/join-us";
 import StaffPortal from "@/pages/staff-portal";
+import StaffRegistration from "@/pages/staff-registration";
 import Packages from "@/pages/packages";
 import NotFound from "@/pages/not-found";
 
@@ -25,6 +26,7 @@ function Router() {
       <Route path="/contact" component={Contact} />
       <Route path="/join-us" component={JoinUs} />
       <Route path="/staff-portal" component={StaffPortal} />
+      <Route path="/staff-registration" component={StaffRegistration} />
       <Route path="/packages" component={Packages} />
       <Route component={NotFound} />
     </Switch>

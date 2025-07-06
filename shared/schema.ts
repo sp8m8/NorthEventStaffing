@@ -1,135 +1,140 @@
-import { pgTable, text, serial, integer, boolean, timestamp } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
+import { pgTable, text, serial, integer, boolean, timestamp, pgEnum, uniqueIndex, foreignKey } from "drizzle-orm/pg-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const staff = pgTable("staff", {
+// Enum for user roles
+export const userRoleEnum = pgEnum("user_role", ["staff", "supervisor", "admin"]);
+
+// Users table for authentication
+export const users = pgTable("users", {
   id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  category: text("category").notNull(), // "bar-staff", "sound-technician", "brand-ambassador", "steward", "security"
-  experience: text("experience").notNull(),
-  rating: integer("rating").notNull().default(5),
-  reviews: integer("reviews").notNull().default(0),
-  location: text("location").notNull(),
-  image: text("image").notNull(),
-  specializations: text("specializations").array(),
-  hourlyRate: integer("hourly_rate").notNull(), // in pounds
-  certifications: text("certifications").array(), // SIA License, First Aid, Food Hygiene, etc.
-  licenseNumber: text("license_number"), // SIA License Number for security staff
-  licenseExpiry: text("license_expiry"), // License expiry date
-  available: boolean("available").notNull().default(true),
-  phoneNumber: text("phone_number"),
-  email: text("email"),
+  email: text("email").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  role: userRoleEnum("role").notNull().default("staff"),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const serviceRequests = pgTable("service_requests", {
+// Staff Profiles table for staff details
+export const staffProfiles = pgTable("staff_profiles", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
+  phoneNumber: text("phone_number"),
+  address: text("address"),
+  postcode: text("postcode"),
+  dateOfBirth: text("date_of_birth"),
+  skills: text("skills").array(),
+  certifications: text("certifications").array(),
+  availability: text("availability").array(),
+  profilePictureUrl: text("profile_picture_url"),
+  status: text("status").notNull().default("pending"), // "pending", "approved", "rejected"
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Events table
+export const events = pgTable("events", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  date: timestamp("date").notNull(),
+  venue: text("venue").notNull(),
+  clientInfo: text("client_info"),
+  status: text("status").notNull().default("planned"), // "planned", "ongoing", "completed", "cancelled"
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Roles table for defining job roles
+export const roles = pgTable("roles", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(), // e.g., "Sound Engineer", "Security", "Bartender"
+  description: text("description"),
+});
+
+// Shifts table linked to events
+export const shifts = pgTable("shifts", {
+  id: serial("id").primaryKey(),
+  eventId: integer("event_id").notNull().references(() => events.id, { onDelete: 'cascade' }),
+  roleId: integer("role_id").notNull().references(() => roles.id, { onDelete: 'cascade' }),
+  startTime: timestamp("start_time").notNull(),
+  endTime: timestamp("end_time").notNull(),
+  payRate: integer("pay_rate").notNull(), // in pence to avoid floating point issues
+  status: text("status").notNull().default("open"), // "open", "filled", "in-progress", "completed", "cancelled"
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Shift Assignments table to link staff to shifts
+export const shiftAssignments = pgTable("shift_assignments", {
+  id: serial("id").primaryKey(),
+  shiftId: integer("shift_id").notNull().references(() => shifts.id, { onDelete: 'cascade' }),
+  staffId: integer("staff_id").notNull().references(() => staffProfiles.id, { onDelete: 'cascade' }),
+  status: text("status").notNull().default("pending"), // "pending", "confirmed", "declined", "completed"
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => {
+  return {
+    unq: uniqueIndex("unq_shift_staff").on(table.shiftId, table.staffId),
+  };
+});
+
+// Enquiries table for customer service requests
+export const enquiries = pgTable("enquiries", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   company: text("company"),
   email: text("email").notNull(),
   phone: text("phone"),
-  eventDate: text("event_date").notNull(),
-  eventLocation: text("event_location").notNull(),
-  staffTypes: text("staff_types").array().notNull(),
-  staffCount: text("staff_count"),
+  eventDate: timestamp("event_date"),
+  eventLocation: text("event_location"),
+  staffTypes: text("staff_types").array(),
+  staffCount: integer("staff_count"),
   eventDuration: text("event_duration"),
   eventDetails: text("event_details"),
   status: text("status").notNull().default("pending"), // "pending", "contacted", "quoted", "booked"
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const testimonials = pgTable("testimonials", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  title: text("title").notNull(),
-  company: text("company").notNull(),
-  content: text("content").notNull(),
-  rating: integer("rating").notNull().default(5),
-  image: text("image").notNull(),
-});
+// Zod schemas for validation
+export const insertUserSchema = createInsertSchema(users);
+export const selectUserSchema = createSelectSchema(users);
 
-export const staffApplications = pgTable("staff_applications", {
-  id: serial("id").primaryKey(),
-  firstName: text("first_name").notNull(),
-  lastName: text("last_name").notNull(),
-  email: text("email").notNull(),
-  phoneNumber: text("phone_number").notNull(),
-  dateOfBirth: text("date_of_birth").notNull(),
-  address: text("address").notNull(),
-  postcode: text("postcode").notNull(),
-  category: text("category").notNull(), // "bar-staff", "sound-technician", "brand-ambassador", "steward", "security"
-  experience: text("experience").notNull(),
-  siaLicenseNumber: text("sia_license_number"),
-  siaLicenseExpiry: text("sia_license_expiry"),
-  firstAidCertified: boolean("first_aid_certified").notNull().default(false),
-  foodHygieneCertified: boolean("food_hygiene_certified").notNull().default(false),
-  rightToWork: boolean("right_to_work").notNull().default(false),
-  availableWeekdays: boolean("available_weekdays").notNull().default(false),
-  availableWeekends: boolean("available_weekends").notNull().default(false),
-  availableEvenings: boolean("available_evenings").notNull().default(false),
-  expectedHourlyRate: integer("expected_hourly_rate"),
-  previousExperience: text("previous_experience"),
-  references: text("references"),
-  status: text("status").notNull().default("pending"), // "pending", "approved", "rejected", "interview"
-  submittedAt: timestamp("submitted_at").defaultNow(),
-  reviewedAt: timestamp("reviewed_at"),
-  reviewedBy: text("reviewed_by"),
-  notes: text("notes"),
-});
+export const insertStaffProfileSchema = createInsertSchema(staffProfiles);
+export const selectStaffProfileSchema = createSelectSchema(staffProfiles);
 
-export const staffSchedule = pgTable("staff_schedule", {
-  id: serial("id").primaryKey(),
-  staffId: integer("staff_id").notNull(),
-  eventId: integer("event_id"),
-  eventName: text("event_name").notNull(),
-  eventDate: text("event_date").notNull(),
-  startTime: text("start_time").notNull(),
-  endTime: text("end_time").notNull(),
-  location: text("location").notNull(),
-  hourlyRate: integer("hourly_rate").notNull(),
-  status: text("status").notNull().default("scheduled"), // "scheduled", "confirmed", "cancelled", "completed"
-  specialInstructions: text("special_instructions"),
-  createdAt: timestamp("created_at").defaultNow(),
-});
+export const insertEventSchema = createInsertSchema(events);
+export const selectEventSchema = createSelectSchema(events);
 
-export const insertStaffSchema = createInsertSchema(staff).omit({
-  id: true,
-});
+export const insertRoleSchema = createInsertSchema(roles);
+export const selectRoleSchema = createSelectSchema(roles);
 
-export const insertServiceRequestSchema = createInsertSchema(serviceRequests).omit({
-  id: true,
-  status: true,
-  createdAt: true,
-});
+export const insertShiftSchema = createInsertSchema(shifts);
+export const selectShiftSchema = createSelectSchema(shifts);
 
-export const insertTestimonialSchema = createInsertSchema(testimonials).omit({
-  id: true,
-});
+export const insertShiftAssignmentSchema = createInsertSchema(shiftAssignments);
+export const selectShiftAssignmentSchema = createSelectSchema(shiftAssignments);
 
-export const insertStaffApplicationSchema = createInsertSchema(staffApplications).omit({
-  id: true,
-  status: true,
-  submittedAt: true,
-  reviewedAt: true,
-  reviewedBy: true,
-  notes: true,
-});
+export const insertEnquirySchema = createInsertSchema(enquiries);
+export const selectEnquirySchema = createSelectSchema(enquiries);
 
-export const insertStaffScheduleSchema = createInsertSchema(staffSchedule).omit({
-  id: true,
-  createdAt: true,
-});
+// Types for convenience
+export type User = z.infer<typeof selectUserSchema>;
+export type NewUser = z.infer<typeof insertUserSchema>;
 
-export type InsertStaff = z.infer<typeof insertStaffSchema>;
-export type Staff = typeof staff.$inferSelect;
+export type StaffProfile = z.infer<typeof selectStaffProfileSchema>;
+export type NewStaffProfile = z.infer<typeof insertStaffProfileSchema>;
 
-export type InsertServiceRequest = z.infer<typeof insertServiceRequestSchema>;
-export type ServiceRequest = typeof serviceRequests.$inferSelect;
+export type Event = z.infer<typeof selectEventSchema>;
+export type NewEvent = z.infer<typeof insertEventSchema>;
 
-export type InsertTestimonial = z.infer<typeof insertTestimonialSchema>;
-export type Testimonial = typeof testimonials.$inferSelect;
+export type Role = z.infer<typeof selectRoleSchema>;
+export type NewRole = z.infer<typeof insertRoleSchema>;
 
-export type InsertStaffApplication = z.infer<typeof insertStaffApplicationSchema>;
-export type StaffApplication = typeof staffApplications.$inferSelect;
+export type Shift = z.infer<typeof selectShiftSchema>;
+export type NewShift = z.infer<typeof insertShiftSchema>;
 
-export type InsertStaffSchedule = z.infer<typeof insertStaffScheduleSchema>;
-export type StaffSchedule = typeof staffSchedule.$inferSelect;
+export type ShiftAssignment = z.infer<typeof selectShiftAssignmentSchema>;
+export type NewShiftAssignment = z.infer<typeof insertShiftAssignmentSchema>;
+
+export type Enquiry = z.infer<typeof selectEnquirySchema>;
+export type NewEnquiry = z.infer<typeof insertEnquirySchema>;

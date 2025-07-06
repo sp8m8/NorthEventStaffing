@@ -11,6 +11,7 @@ import Staff from "@/pages/staff";
 import About from "@/pages/about";
 import Contact from "@/pages/contact";
 import JoinUs from "@/pages/join-us";
+import StaffPortal from "@/pages/staff-portal";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -22,6 +23,7 @@ function Router() {
       <Route path="/about" component={About} />
       <Route path="/contact" component={Contact} />
       <Route path="/join-us" component={JoinUs} />
+      <Route path="/staff-portal" component={StaffPortal} />
       <Route component={NotFound} />
     </Switch>
   );

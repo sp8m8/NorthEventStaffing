@@ -352,7 +352,7 @@ export default function Contact() {
                       <Phone className="w-5 h-5 text-primary mr-3" />
                       <div>
                         <p className="font-semibold text-dark">Phone</p>
-                        <p className="text-medium">0113 456 7890</p>
+                        <a href="tel:+447706593557" className="text-medium hover:text-primary">Tel: (+44) 7706593557</a>
                       </div>
                     </div>
                     <div className="flex items-center">
@@ -389,9 +389,11 @@ export default function Contact() {
                   <p className="mb-4">
                     Need staff urgently? Call us directly for same-day bookings and emergency staffing requirements.
                   </p>
-                  <Button variant="outline" className="w-full border-white text-white hover:bg-white hover:text-primary">
-                    Call Now: 0113 456 7890
-                  </Button>
+                  <a href="tel:+447706593557">
+                    <Button variant="outline" className="w-full border-primary bg-white text-primary hover:bg-primary hover:text-white">
+                      Call Now: (+44) 7706593557
+                    </Button>
+                  </a>
                 </CardContent>
               </Card>
             </div>

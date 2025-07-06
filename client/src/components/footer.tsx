@@ -6,8 +6,7 @@ const footerNavs = [
     label: "Services",
     items: [
       { href: "/services", name: "All Services" },
-      { href: "/packages", name: "Event Packages" },
-      { href: "/staff-portal", name: "Staff Portal" },
+      { href: " /packages", name: "Event Packages" },
       { href: "/join-us", name: "Join Our Team" },
       { href: "/contact", name: "Get Quote" },
     ],

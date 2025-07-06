@@ -12,7 +12,6 @@ const navigation = [
   { name: "Our Staff", href: "/staff" },
   { name: "About", href: "/about" },
   { name: "Join Us", href: "/join-us" },
-  { name: "Staff Portal", href: "/staff-portal" },
 ];
 
 function NavLink({ href, children }) {

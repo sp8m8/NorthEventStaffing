@@ -106,7 +106,7 @@ export default function StaffPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-dark mb-4">Why Choose NORTH STAFF?</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               We provide fully vetted, qualified professionals across all event staffing categories
             </p>
           </div>
@@ -144,7 +144,7 @@ export default function StaffPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-dark mb-4">Our Staffing Categories</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Professional event staff across all categories for music events and beyond
             </p>
           </div>
@@ -168,7 +168,7 @@ export default function StaffPage() {
                       <h4 className="font-semibold text-dark mb-2">Requirements:</h4>
                       <ul className="space-y-1">
                         {category.requirements.map((req, reqIndex) => (
-                          <li key={reqIndex} className="flex items-center text-sm text-gray-600">
+                          <li key={reqIndex} className="flex items-center text-sm text-muted-foreground">
                             <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
                             {req}
                           </li>

@@ -8,7 +8,6 @@ const primaryAreas = [
 export default function CoverageArea() {
   return (
     <section className="py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-dark mb-4">Coverage Area</h2>
           <p className="text-xl text-medium max-w-3xl mx-auto">
@@ -37,14 +36,13 @@ export default function CoverageArea() {
             
             <div className="bg-light rounded-lg p-6">
               <h4 className="font-bold text-dark mb-3">Extended Coverage</h4>
-              <p className="text-medium">
+              <p className="text-muted-foreground">
                 We also provide staffing services across Manchester, Liverpool, Newcastle, 
                 and other major cities in the North of England for larger events.
               </p>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
   );
 }

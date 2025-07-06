@@ -11,7 +11,6 @@ export default function Testimonials() {
   if (isLoading) {
     return (
       <section className="py-20 bg-light">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <p className="text-medium">Loading testimonials...</p>
           </div>
@@ -50,14 +49,12 @@ export default function Testimonials() {
                   />
                   <div>
                     <p className="font-semibold text-dark">{testimonial.name}</p>
-                    <p className="text-medium text-sm">{testimonial.title}, {testimonial.company}</p>
+                    <p className="text-muted-foreground text-sm">{testimonial.title}, {testimonial.company}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
           ))}
-        </div>
-      </div>
-    </section>
+        </section>
   );
 }

@@ -129,9 +129,8 @@ const services = [
 export default function ServicesSection() {
   return (
     <section className="py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-dark mb-4">Comprehensive Music Event Staffing</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Comprehensive Music Event Staffing</h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Your one stop shop for professional music event staff across the North of England. Fair rates, fast response, full UK regulatory compliance.
           </p>
@@ -143,7 +142,7 @@ export default function ServicesSection() {
               <CardContent className="p-6">
                 <div className="text-center mb-4">
                   <service.icon className="w-8 h-8 text-primary mx-auto mb-2" />
-                  <h3 className="text-lg font-bold text-dark mb-2">{service.title}</h3>
+                  <h3 className="text-lg font-bold text-foreground mb-2">{service.title}</h3>
                 </div>
                 <ul className="space-y-2 mb-6">
                   {service.features.map((feature) => (
@@ -165,7 +164,6 @@ export default function ServicesSection() {
             </Card>
           ))}
         </div>
-      </div>
     </section>
   );
 }

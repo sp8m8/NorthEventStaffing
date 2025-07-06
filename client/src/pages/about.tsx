@@ -86,7 +86,7 @@ export default function About() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-dark mb-4">At a Glance</h2>
-            <p className="text-xl text-medium">
+            <p className="text-xl text-muted-foreground">
               Key facts about NORTH STAFF's comprehensive music event staffing service
             </p>
           </div>
@@ -110,7 +110,7 @@ export default function About() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-dark mb-4">Why Choose NORTH STAFF</h2>
-            <p className="text-xl text-medium">
+            <p className="text-xl text-muted-foreground">
               What makes us the one-stop shop for music event staffing up north
             </p>
           </div>
@@ -133,7 +133,7 @@ export default function About() {
       <section className="py-20 bg-light">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-dark mb-8">Our Mission</h2>
-          <p className="text-xl text-medium leading-relaxed">
+          <p className="text-xl text-muted-foreground leading-relaxed">
             To provide exceptional event staffing solutions that exceed expectations, 
             while supporting the growth of Yorkshire's vibrant events industry. 
             We believe that every event, no matter the size, deserves professional, 

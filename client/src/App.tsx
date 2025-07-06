@@ -37,7 +37,7 @@ function App() {
       <TooltipProvider>
         <div className="min-h-screen flex flex-col">
           <Header />
-          <main className="flex-1">
+          <main className="flex-1 container mx-auto px-4">
             <Router />
           </main>
           <Footer />

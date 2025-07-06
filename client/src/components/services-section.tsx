@@ -132,32 +132,32 @@ export default function ServicesSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-dark mb-4">Comprehensive Music Event Staffing</h2>
-          <p className="text-xl text-medium max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Your one stop shop for professional music event staff across the North of England. Fair rates, fast response, full UK regulatory compliance.
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {services.map((service) => (
-            <Card key={service.title} className="bg-light shadow-lg hover:shadow-xl transition-shadow">
-              <CardContent className="p-8">
-                <div className="text-center mb-6">
-                  <service.icon className="w-12 h-12 text-primary mx-auto mb-4" />
-                  <h3 className="text-2xl font-bold text-dark mb-4">{service.title}</h3>
+            <Card key={service.title} className="bg-white shadow-lg hover:shadow-xl transition-shadow">
+              <CardContent className="p-6">
+                <div className="text-center mb-4">
+                  <service.icon className="w-8 h-8 text-primary mx-auto mb-2" />
+                  <h3 className="text-lg font-bold text-dark mb-2">{service.title}</h3>
                 </div>
-                <ul className="space-y-3 mb-8">
+                <ul className="space-y-2 mb-6">
                   {service.features.map((feature) => (
-                    <li key={feature} className="flex items-center text-medium">
+                    <li key={feature} className="flex items-center text-gray-600 text-sm">
                       <Check className="w-4 h-4 text-green-500 mr-3 flex-shrink-0" />
                       {feature}
                     </li>
                   ))}
                 </ul>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-primary mb-4">{service.price}</p>
+                  <p className="text-xl font-bold text-primary mb-3">{service.price}</p>
                   <Link href="/contact">
-                    <Button className="w-full bg-primary text-white hover:bg-secondary">
-                      Request {service.title}
+                    <Button size="sm" className="w-full bg-primary text-white hover:bg-secondary text-xs">
+                      Request Quote
                     </Button>
                   </Link>
                 </div>

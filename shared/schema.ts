@@ -1,140 +1,274 @@
-import { pgTable, text, serial, integer, boolean, timestamp, pgEnum, uniqueIndex, foreignKey } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  serial,
+  text,
+  varchar,
+  timestamp,
+  integer,
+  boolean,
+  pgEnum,
+  decimal,
+  date,
+} from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
+
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+
+// Zod for schema validation
 import { z } from "zod";
 
-// Enum for user roles
-export const userRoleEnum = pgEnum("user_role", ["staff", "supervisor", "admin"]);
 
-// Users table for authentication
+// USERS
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
-  email: text("email").notNull().unique(),
-  passwordHash: text("password_hash").notNull(),
-  role: userRoleEnum("role").notNull().default("staff"),
-  createdAt: timestamp("created_at").defaultNow(),
+  fullName: text("full_name").notNull(),
+  email: varchar("email", { length: 256 }).notNull().unique(),
+  phone: varchar("phone", { length: 256 }),
+  address: text("address"),
+  userType: text("user_type").notNull().default("client"), // 'client', 'staff', 'manager', 'admin'
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-// Staff Profiles table for staff details
+// Zod schema for user creation (insert)
+export const insertUserSchema = z.object({
+  fullName: z.string().min(1, "Full name is required"),
+  email: z.string().email("Valid email is required"),
+  phone: z.string().optional(),
+  address: z.string().optional(),
+  userType: z.string().optional(),
+});
+
+export const usersRelations = relations(users, ({ many }) => ({
+  staffProfile: many(staffProfiles),
+  sentMessages: many(messages, { relationName: "sender" }),
+  receivedMessages: many(messages, { relationName: "receiver" }),
+}));
+
+// STAFF PROFILES
 export const staffProfiles = pgTable("staff_profiles", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
-  firstName: text("first_name").notNull(),
-  lastName: text("last_name").notNull(),
-  phoneNumber: text("phone_number"),
-  address: text("address"),
-  postcode: text("postcode"),
-  dateOfBirth: text("date_of_birth"),
-  skills: text("skills").array(),
-  certifications: text("certifications").array(),
-  availability: text("availability").array(),
-  profilePictureUrl: text("profile_picture_url"),
-  status: text("status").notNull().default("pending"), // "pending", "approved", "rejected"
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  userId: integer("user_id")
+    .references(() => users.id)
+    .notNull(),
+  bio: text("bio"),
+  skills: text("skills"), // Comma-separated or JSON
+  experience: text("experience"),
+  rating: decimal("rating", { precision: 3, scale: 2 }),
+  payRate: decimal("pay_rate", { precision: 10, scale: 2 }).notNull(),
 });
 
-// Events table
-export const events = pgTable("events", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  date: timestamp("date").notNull(),
-  venue: text("venue").notNull(),
-  clientInfo: text("client_info"),
-  status: text("status").notNull().default("planned"), // "planned", "ongoing", "completed", "cancelled"
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
-// Roles table for defining job roles
-export const roles = pgTable("roles", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull().unique(), // e.g., "Sound Engineer", "Security", "Bartender"
-  description: text("description"),
-});
-
-// Shifts table linked to events
-export const shifts = pgTable("shifts", {
-  id: serial("id").primaryKey(),
-  eventId: integer("event_id").notNull().references(() => events.id, { onDelete: 'cascade' }),
-  roleId: integer("role_id").notNull().references(() => roles.id, { onDelete: 'cascade' }),
-  startTime: timestamp("start_time").notNull(),
-  endTime: timestamp("end_time").notNull(),
-  payRate: integer("pay_rate").notNull(), // in pence to avoid floating point issues
-  status: text("status").notNull().default("open"), // "open", "filled", "in-progress", "completed", "cancelled"
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
-// Shift Assignments table to link staff to shifts
-export const shiftAssignments = pgTable("shift_assignments", {
-  id: serial("id").primaryKey(),
-  shiftId: integer("shift_id").notNull().references(() => shifts.id, { onDelete: 'cascade' }),
-  staffId: integer("staff_id").notNull().references(() => staffProfiles.id, { onDelete: 'cascade' }),
-  status: text("status").notNull().default("pending"), // "pending", "confirmed", "declined", "completed"
-  createdAt: timestamp("created_at").defaultNow(),
-}, (table) => {
-  return {
-    unq: uniqueIndex("unq_shift_staff").on(table.shiftId, table.staffId),
-  };
-});
-
-// Enquiries table for customer service requests
-export const enquiries = pgTable("enquiries", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  company: text("company"),
-  email: text("email").notNull(),
-  phone: text("phone"),
-  eventDate: timestamp("event_date"),
-  eventLocation: text("event_location"),
-  staffTypes: text("staff_types").array(),
-  staffCount: integer("staff_count"),
-  eventDuration: text("event_duration"),
-  eventDetails: text("event_details"),
-  status: text("status").notNull().default("pending"), // "pending", "contacted", "quoted", "booked"
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-// Zod schemas for validation
-export const insertUserSchema = createInsertSchema(users);
-export const selectUserSchema = createSelectSchema(users);
-
+// Zod schema for staff profile creation (insert)
 export const insertStaffProfileSchema = createInsertSchema(staffProfiles);
 export const selectStaffProfileSchema = createSelectSchema(staffProfiles);
 
-export const insertEventSchema = createInsertSchema(events);
-export const selectEventSchema = createSelectSchema(events);
+export const staffProfilesRelations = relations(staffProfiles, ({ one, many }) => ({
+  user: one(users, { fields: [staffProfiles.userId], references: [users.id] }),
+  shiftAssignments: many(shiftAssignments),
+  payrollRecords: many(payrollRecords),
+}));
 
-export const insertRoleSchema = createInsertSchema(roles);
-export const selectRoleSchema = createSelectSchema(roles);
+// EVENTS
+export const events = pgTable("events", {
+  id: serial("id").primaryKey(),
+  eventName: text("event_name").notNull(),
+  clientName: text("client_name").notNull(),
+  eventDate: date("event_date").notNull(),
+  location: text("location").notNull(),
+  status: text("status").default("planned"), // 'planned', 'ongoing', 'completed', 'cancelled'
+});
 
+// Zod schema for event creation (insert)
+export const insertEventSchema = z.object({
+  eventName: z.string().min(1, "Event name is required"),
+  clientName: z.string().min(1, "Client name is required"),
+  eventDate: z.string().min(1, "Event date is required"),
+  location: z.string().min(1, "Location is required"),
+  status: z.string().optional(),
+});
+
+export const eventsRelations = relations(events, ({ many }) => ({
+  shifts: many(shifts),
+  messages: many(messages),
+}));
+
+// SHIFTS
+export const shifts = pgTable("shifts", {
+  id: serial("id").primaryKey(),
+  eventId: integer("event_id")
+    .references(() => events.id)
+    .notNull(),
+  roleId: integer("role_id")
+    .references(() => roles.id)
+    .notNull(),
+  startTime: timestamp("start_time").notNull(),
+  endTime: timestamp("end_time").notNull(),
+  requiredStaff: integer("required_staff").notNull(),
+});
+
+// Zod schema for shift creation (insert)
 export const insertShiftSchema = createInsertSchema(shifts);
 export const selectShiftSchema = createSelectSchema(shifts);
 
+export const shiftsRelations = relations(shifts, ({ one, many }) => ({
+  event: one(events, { fields: [shifts.eventId], references: [events.id] }),
+  role: one(roles, { fields: [shifts.roleId], references: [roles.id] }),
+  shiftAssignments: many(shiftAssignments),
+}));
+
+// ROLES
+export const roles = pgTable("roles", {
+  id: serial("id").primaryKey(),
+  roleName: text("role_name").notNull(), // e.g., 'Bartender', 'Security', 'Waiter'
+  description: text("description"),
+});
+
+// Zod schema for role creation (insert)
+export const insertRoleSchema = createInsertSchema(roles);
+export const selectRoleSchema = createSelectSchema(roles);
+
+export const rolesRelations = relations(roles, ({ many }) => ({
+  shifts: many(shifts),
+}));
+
+// SHIFT ASSIGNMENTS
+export const shiftAssignments = pgTable("shift_assignments", {
+  id: serial("id").primaryKey(),
+  shiftId: integer("shift_id")
+    .references(() => shifts.id)
+    .notNull(),
+  staffId: integer("staff_id")
+    .references(() => staffProfiles.id)
+    .notNull(),
+  status: text("status").default("pending"), // 'pending', 'confirmed', 'cancelled'
+});
+
+// Zod schema for shift assignment creation (insert)
 export const insertShiftAssignmentSchema = createInsertSchema(shiftAssignments);
 export const selectShiftAssignmentSchema = createSelectSchema(shiftAssignments);
 
+export const shiftAssignmentsRelations = relations(
+  shiftAssignments,
+  ({ one, many }) => ({
+    shift: one(shifts, {
+      fields: [shiftAssignments.shiftId],
+      references: [shifts.id],
+    }),
+    staffProfile: one(staffProfiles, {
+      fields: [shiftAssignments.staffId],
+      references: [staffProfiles.id],
+    }),
+    timesheet: many(timesheets),
+  }),
+);
+
+// ENQUIRIES
+export const enquiries = pgTable("enquiries", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  email: varchar("email", { length: 256 }).notNull(),
+  message: text("message").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Zod schema for enquiry creation (insert)
 export const insertEnquirySchema = createInsertSchema(enquiries);
 export const selectEnquirySchema = createSelectSchema(enquiries);
 
-// Types for convenience
-export type User = z.infer<typeof selectUserSchema>;
-export type NewUser = z.infer<typeof insertUserSchema>;
+// New Communication Table
+export const messages = pgTable("messages", {
+  id: serial("id").primaryKey(),
+  eventId: integer("event_id")
+    .references(() => events.id)
+    .notNull(),
+  senderId: integer("sender_id")
+    .references(() => users.id)
+    .notNull(),
+  receiverId: integer("receiver_id")
+    .references(() => users.id)
+    .notNull(),
+  message: text("message").notNull(),
+  sentAt: timestamp("sent_at").defaultNow().notNull(),
+  read: boolean("read").default(false),
+});
 
-export type StaffProfile = z.infer<typeof selectStaffProfileSchema>;
-export type NewStaffProfile = z.infer<typeof insertStaffProfileSchema>;
+// Zod schema for message creation (insert)
+export const insertMessageSchema = createInsertSchema(messages);
+export const selectMessageSchema = createSelectSchema(messages);
 
-export type Event = z.infer<typeof selectEventSchema>;
-export type NewEvent = z.infer<typeof insertEventSchema>;
+export const messagesRelations = relations(messages, ({ one }) => ({
+  event: one(events, { fields: [messages.eventId], references: [events.id] }),
+  sender: one(users, {
+    fields: [messages.senderId],
+    references: [users.id],
+    relationName: "sender",
+  }),
+  receiver: one(users, {
+    fields: [messages.receiverId],
+    references: [users.id],
+    relationName: "receiver",
+  }),
+}));
 
-export type Role = z.infer<typeof selectRoleSchema>;
-export type NewRole = z.infer<typeof insertRoleSchema>;
+// New Timesheet Table
+export const timesheetStatusEnum = pgEnum("timesheet_status", [
+  "pending",
+  "approved",
+  "rejected",
+]);
 
-export type Shift = z.infer<typeof selectShiftSchema>;
-export type NewShift = z.infer<typeof insertShiftSchema>;
+export const timesheets = pgTable("timesheets", {
+  id: serial("id").primaryKey(),
+  shiftAssignmentId: integer("shift_assignment_id")
+    .references(() => shiftAssignments.id)
+    .notNull(),
+  checkInTime: timestamp("check_in_time").notNull(),
+  checkOutTime: timestamp("check_out_time").notNull(),
+  breakDuration: integer("break_duration"), // in minutes
+  overtimeHours: decimal("overtime_hours", { precision: 5, scale: 2 }),
+  status: timesheetStatusEnum("status").default("pending"),
+  managerNotes: text("manager_notes"),
+  submittedAt: timestamp("submitted_at").defaultNow().notNull(),
+});
 
-export type ShiftAssignment = z.infer<typeof selectShiftAssignmentSchema>;
-export type NewShiftAssignment = z.infer<typeof insertShiftAssignmentSchema>;
+// Zod schema for timesheet creation (insert)
+export const insertTimesheetSchema = createInsertSchema(timesheets);
+export const selectTimesheetSchema = createSelectSchema(timesheets);
 
-export type Enquiry = z.infer<typeof selectEnquirySchema>;
-export type NewEnquiry = z.infer<typeof insertEnquirySchema>;
+export const timesheetsRelations = relations(timesheets, ({ one }) => ({
+  shiftAssignment: one(shiftAssignments, {
+    fields: [timesheets.shiftAssignmentId],
+    references: [shiftAssignments.id],
+  }),
+}));
+
+// New Payroll Table
+export const payrollStatusEnum = pgEnum("payroll_status", [
+  "pending",
+  "processed",
+  "paid",
+]);
+
+export const payrollRecords = pgTable("payroll_records", {
+  id: serial("id").primaryKey(),
+  staffId: integer("staff_id")
+    .references(() => staffProfiles.id)
+    .notNull(),
+  payPeriodStart: date("pay_period_start").notNull(),
+  payPeriodEnd: date("pay_period_end").notNull(),
+  totalHours: decimal("total_hours", { precision: 10, scale: 2 }).notNull(),
+  totalPay: decimal("total_pay", { precision: 10, scale: 2 }).notNull(),
+  status: payrollStatusEnum("status").default("pending"),
+  processedAt: timestamp("processed_at"),
+  paymentDate: date("payment_date"),
+});
+
+// Zod schema for payroll record creation (insert)
+export const insertPayrollRecordSchema = createInsertSchema(payrollRecords);
+export const selectPayrollRecordSchema = createSelectSchema(payrollRecords);
+
+export const payrollRecordsRelations = relations(payrollRecords, ({ one }) => ({
+  staffProfile: one(staffProfiles, {
+    fields: [payrollRecords.staffId],
+    references: [staffProfiles.id],
+  }),
+}));

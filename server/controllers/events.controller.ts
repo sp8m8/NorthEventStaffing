@@ -1,6 +1,6 @@
 
 import { Request, Response } from 'express';
-import { eventsService } from './events.service';
+import { eventsService } from '../services/events.service';
 import { insertEventSchema } from '@shared/schema';
 
 export const eventsController = {

@@ -10,6 +10,9 @@ import enquiriesRouter from "./routes/enquiries.routes";
 import shiftAssignmentsRouter from "./routes/shift-assignments.routes";
 import calendarRouter from "./routes/calendar.routes";
 import remindersRouter from "./routes/reminders.routes";
+import messagesRouter from "./routes/messages.routes";
+import timesheetsRouter from "./routes/timesheets.routes";
+import payrollRouter from "./routes/payroll.routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/events", eventsRouter);
@@ -21,6 +24,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/shift-assignments", shiftAssignmentsRouter);
   app.use("/api/calendar", calendarRouter);
   app.use("/api/reminders", remindersRouter);
+  app.use("/api/messages", messagesRouter);
+  app.use("/api/timesheets", timesheetsRouter);
+  app.use("/api/payroll", payrollRouter);
 
   const httpServer = createServer(app);
   return httpServer;

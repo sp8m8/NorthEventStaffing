@@ -24,8 +24,8 @@ This documentation provides a comprehensive reference for developers working on 
 
 - **Monorepo**: Contains `client` (React), `server` (Express), and `shared` (schema, types).
 - **Frontend**: React (Vite, TypeScript, Tailwind CSS, shadcn/ui, Wouter, TanStack Query)
-- **Backend**: Express.js (TypeScript, REST API)
-- **Database**: PostgreSQL (Drizzle ORM)
+- **Backend**: Express.js (TypeScript, REST API, Zod validation)
+- **Database**: PostgreSQL (Drizzle ORM, Neon serverless)
 
 ---
 
@@ -41,20 +41,26 @@ This documentation provides a comprehensive reference for developers working on 
 - **GET `/api/staff`**: List all staff.
 - **GET `/api/staff/category/:category`**: List staff by category.
 - **GET `/api/staff/:id`**: Get a single staff member.
-- (Additional endpoints for service requests, testimonials, etc.)
-- Uses Zod schemas for validation.
+- **POST `/api/service-requests`**: Submit a new service request (Zod validated).
+- **POST `/api/staff-applications`**: Submit a staff application (Zod validated).
+- **GET `/api/testimonials`**: List testimonials.
+- (See file for more endpoints.)
+- Uses Zod schemas for validation and type safety.
 
 ### Database Layer (`server/db.ts`)
 - Connects to PostgreSQL using Neon serverless driver.
 - Uses Drizzle ORM for type-safe queries.
 - Loads schema from `shared/schema.ts`.
 - Requires `DATABASE_URL` in environment.
+- Supports serverless and local development.
 
 ### Schema (`shared/schema.ts`)
 Defines main tables:
 - **staff**: id, name, category, experience, rating, reviews, location, image, specializations, hourlyRate, certifications, license info, contact, availability.
 - **service_requests**: id, name, company, email, phone, event details, staff types/count, status, createdAt.
 - **testimonials**: id, name, company, testimonial, rating, createdAt.
+
+All schemas are exported for use in both backend and frontend validation.
 
 ---
 
@@ -65,6 +71,7 @@ Defines main tables:
 - Provides routes for Home, Services, Staff, About, Contact, Join Us, Staff Portal, Packages, NotFound.
 - Wraps app in `QueryClientProvider` (TanStack Query) and `TooltipProvider`.
 - Main layout: `<Header />`, `<main>`, `<Footer />`.
+- Uses shadcn/ui and Radix UI for accessible, modern UI components.
 
 ### Hooks
 - **`useIsMobile`** (`client/src/hooks/use-mobile.tsx`):
@@ -73,6 +80,7 @@ Defines main tables:
 - **`useToast`** (`client/src/hooks/use-toast.ts`):
   - Manages toast notifications (add, update, dismiss, remove).
   - Supports custom actions and limits.
+  - Used throughout the UI for feedback and alerts.
 
 ### Lib Utilities
 - **`queryClient.ts`**:
@@ -81,6 +89,7 @@ Defines main tables:
   - `getQueryFn` for custom query functions with 401 handling.
 - **`utils.ts`**:
   - Exports `cn` utility for merging Tailwind/clsx class names.
+  - Used for dynamic class composition in all UI components.
 
 ---
 
@@ -101,7 +110,7 @@ Defines main tables:
 
 ## Environment Variables
 - `DATABASE_URL` — PostgreSQL connection string
-- `GEMINI_API_KEY` — API key for Gemini integration
+- `GEMINI_API_KEY` — API key for Gemini integration (required for Gemini-powered features)
 
 ---
 
@@ -109,6 +118,7 @@ Defines main tables:
 - Use `npm run dev` to start both client and server in development mode.
 - Use `npm run db:push` to sync schema with the database.
 - All shared types and schemas are in `shared/schema.ts` for both client and server.
+- Use `.env` to manage API keys and secrets securely.
 
 ---
 

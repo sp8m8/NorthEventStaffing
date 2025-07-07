@@ -54,7 +54,8 @@ export default function Testimonials() {
               </CardContent>
             </Card>
           ))}
-          </div>
-      </section>
+        </div>
+      </div>
+    </section>
   );
 }

@@ -35,7 +35,7 @@ const socialLinks = [
 export default function Footer() {
   return (
     <footer className="border-t">
-      <div className="container py-12">
+      <div className="py-12 px-4">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-4">
             <Link href="/" className="flex items-center space-x-2">

@@ -107,10 +107,11 @@ export default function StaffPortal() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="shifts">Available Shifts</TabsTrigger>
             <TabsTrigger value="applications">My Applications</TabsTrigger>
             <TabsTrigger value="schedule">My Schedule</TabsTrigger>
+            <TabsTrigger value="submit-timesheet">Submit Timesheet</TabsTrigger>
           </TabsList>
 
           <TabsContent value="shifts" className="space-y-6">
@@ -239,6 +240,10 @@ export default function StaffPortal() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="submit-timesheet" className="space-y-6">
+            <StaffTimesheetForm currentUserId="mock-staff-id-123" />
           </TabsContent>
         </Tabs>
       </div>

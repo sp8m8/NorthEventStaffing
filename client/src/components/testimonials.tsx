@@ -14,7 +14,6 @@ export default function Testimonials() {
           <div className="text-center">
             <p className="text-medium">Loading testimonials...</p>
           </div>
-        </div>
       </section>
     );
   }
@@ -55,6 +54,7 @@ export default function Testimonials() {
               </CardContent>
             </Card>
           ))}
-        </section>
+          </div>
+      </section>
   );
 }
